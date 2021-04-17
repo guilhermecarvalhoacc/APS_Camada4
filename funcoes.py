@@ -6,13 +6,13 @@ from datetime import datetime
 
 
 def cria_texto_server(string_log):
-    f = open("logs/Server2.txt", "a+")
+    f = open("logs/Server3.txt", "a+")
     f.write(string_log)
     f.close()
 
 
 def cria_texto_client(string_log):
-    f = open("logs/Client2.txt", "a+")
+    f = open("logs/Client3.txt", "a+")
     f.write(string_log)
     f.close()
 

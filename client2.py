@@ -14,6 +14,7 @@ com1.enable()
 
 
 def sinal_para_desligar():
+    global string_log
     payload = []
     header = [0]*10
     header[0] = 5
@@ -21,6 +22,8 @@ def sinal_para_desligar():
     header[2] = Id_server
     pacote = cria_datagrama(payload, header)
     com1.sendData(pacote)
+    instante_envio = get_current_time()
+    string_log += f'{instante_envio} / {"envio"} / {header[0]} / {len(pacote)}\n'
 
 
 def desconectar():
@@ -54,6 +57,7 @@ def envia_handshake(pacote_hanshake):
                 # enviar pacote com h0 = 5
                 # escrever log
                 sinal_para_desligar()
+                cria_texto_client(string_log)
                 desconectar()
 
             elif timer1 > 5:
@@ -63,8 +67,8 @@ def envia_handshake(pacote_hanshake):
                 if enviar_novamente == 'sim':
                     # enviar handshake novamente
                     instante_envio = get_current_time()
-                    string_log += f'{instante_envio} / {envio_recebimento} / {msg_type} / {tamanho_msg_total}\n'
                     com1.sendData(pacote_hanshake)
+                    string_log += f'{instante_envio} / {envio_recebimento} / {msg_type} / {tamanho_msg_total}\n'
                     print(f'string log: {string_log}')
 
                     init_timer1 = time.time()
@@ -188,17 +192,12 @@ def main():
             delta_time = time.time() - init_timer1
             last_sent_pkg = i + 1
             pacote_enviar = lista_pacotes[i]
-            
-            if i == 3:
-                simulate_error(i, lista_pacotes, lista_pacotes[i])
+            com1.sendData(pacote_enviar)
+            str_log = cria_log_envio(pacote_enviar)
+            string_log += str_log
 
-            else:
-                com1.sendData(pacote_enviar)
-                print(f'enviou o pacote {i}\n')
-                time.sleep(0.2)
-
-                recebe_confirmacao_recebimento(
-                    pacote_enviar, last_sent_pkg, lista_pacotes)
+            recebe_confirmacao_recebimento(
+                pacote_enviar, last_sent_pkg, lista_pacotes)
 
         time.sleep(1)
         # Encerra comunicação
