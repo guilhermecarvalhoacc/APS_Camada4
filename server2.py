@@ -29,8 +29,10 @@ def sinal_para_desligar():
 def desconectar():
     time.sleep(1)
     com2.disable()
+    salvar_log()
     os._exit(os.EX_OK)
     print(f'Conexão encerrada')
+
 
 def salvar_log():
     return None
@@ -60,19 +62,17 @@ def recebe_handshake():
                 header[0] = 2
                 header[1] = client_id
                 header[2] = server_id
-                # pacote = cria_datagrama(payload, header)
-                # com2.sendData(pacote)
-                # terminou_handshake = True
-                # lista_hs = [int.from_bytes(i, 'big') for i in pacote]
-                # instante_envio = get_current_time()
-                # msg_type = lista_hs[0]
-                # tamanho_msg_total = len(pacote)
-                # envio_recebimento = 'envio'
-                # string_log += f'{instante_envio} / {envio_recebimento} / {msg_type} / {tamanho_msg_total}\n'
-                # print(f'handshake enviado pro client')
+                pacote = cria_datagrama(payload, header)
+                com2.sendData(pacote)
+                terminou_handshake = True
+                lista_hs = [int.from_bytes(i, 'big') for i in pacote]
+                instante_envio = get_current_time()
+                msg_type = lista_hs[0]
+                tamanho_msg_total = len(pacote)
+                envio_recebimento = 'envio'
+                string_log += f'{instante_envio} / {envio_recebimento} / {msg_type} / {tamanho_msg_total}\n'
+                print(f'handshake enviado pro client')
             elif header[0] == 5:
-                print("ENTROU NO ERRO ")
-                cria_texto_server(string_log)
                 desconectar()
 
         else:
@@ -133,6 +133,9 @@ def recebe_imagem(quantidade_pacotes):
 
         if msg_type == 5:
             print(f'Código 5 - desligar...')
+            instante_envio = get_current_time()
+            string_log += f'{instante_envio} / {"receb"} / {msg_type} / {tamanho_pacote + len(received_head)}\n'
+            cria_texto_server(string_log)
             desconectar()
 
         pacote_recebido, len_pacote_recebido = com2.getData(
@@ -191,14 +194,19 @@ def build_response(pacote_deu_certo, numero_pacote_atual, payload_recebido):
     pacote1 = cria_datagrama(payload, lista_head)
     # to simulate error (sem resposta do servidor)
 
-    lista_hs = [int.from_bytes(i, 'big') for i in pacote1]
-    instante_envio = get_current_time()
-    msg_type = lista_hs[0]
-    tamanho_msg_total = len(pacote1)
-    envio_recebimento = 'envio'
-    string_log += f'{instante_envio} / {envio_recebimento} / {msg_type} / {tamanho_msg_total}\n'
+    if numero_pacote_atual > 4:
+        print('simulando falta de resposta')
+    else:
+        lista_hs = [int.from_bytes(i, 'big') for i in pacote1]
+        instante_envio = get_current_time()
+        msg_type = lista_hs[0]
+        tamanho_msg_total = len(pacote1)
+        envio_recebimento = 'envio'
+        string_log += f'{instante_envio} / {envio_recebimento} / {msg_type} / {tamanho_msg_total}\n'
 
-    com2.sendData(pacote1)
+        com2.sendData(pacote1)
+
+
 
 
 def main():

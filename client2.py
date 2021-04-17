@@ -57,7 +57,6 @@ def envia_handshake(pacote_hanshake):
                 # enviar pacote com h0 = 5
                 # escrever log
                 sinal_para_desligar()
-                cria_texto_client(string_log)
                 desconectar()
 
             elif timer1 > 5:
@@ -67,8 +66,8 @@ def envia_handshake(pacote_hanshake):
                 if enviar_novamente == 'sim':
                     # enviar handshake novamente
                     instante_envio = get_current_time()
-                    com1.sendData(pacote_hanshake)
                     string_log += f'{instante_envio} / {envio_recebimento} / {msg_type} / {tamanho_msg_total}\n'
+                    com1.sendData(pacote_hanshake)
                     print(f'string log: {string_log}')
 
                     init_timer1 = time.time()
@@ -120,6 +119,7 @@ def recebe_confirmacao_recebimento(pacote_enviar, last_sent_pkg, lista_pacotes):
                     f'Tempo máximo excedido, avisando server desligamento...')
 
                 sinal_para_desligar()
+                cria_texto_client(string_log)
                 time.sleep(1)
                 desconectar()
 
@@ -134,7 +134,7 @@ def recebe_confirmacao_recebimento(pacote_enviar, last_sent_pkg, lista_pacotes):
         received_head = list(received_head)
         string_log += cria_log_msg_recebida(received_head)
 
-        print(f'string log: \n{string_log}')
+
         print(f'header recebido: {received_head}', end='')
         # get payload and eop
 
@@ -214,7 +214,7 @@ def main():
 
 
 def cria_log_envio(pacote_enviar_bytes):
-    send_or_receive = 'send'
+    send_or_receive = 'envio'
     head_binario = list(pacote_enviar_bytes)[:10]
     head_int = [int.from_bytes(byte, 'big') for byte in head_binario]
 
