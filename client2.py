@@ -51,6 +51,8 @@ def envia_handshake(pacote_hanshake):
 
             if timer2 > 20:
                 print(f'passou 20 segundo, desligando tudo')
+                # enviar pacote com h0 = 5
+                # escrever log
                 sinal_para_desligar()
                 desconectar()
 
@@ -128,7 +130,7 @@ def recebe_confirmacao_recebimento(pacote_enviar, last_sent_pkg, lista_pacotes):
         received_head = list(received_head)
         string_log += cria_log_msg_recebida(received_head)
 
-
+        print(f'string log: \n{string_log}')
         print(f'header recebido: {received_head}', end='')
         # get payload and eop
 
@@ -186,12 +188,17 @@ def main():
             delta_time = time.time() - init_timer1
             last_sent_pkg = i + 1
             pacote_enviar = lista_pacotes[i]
-            com1.sendData(pacote_enviar)
-            str_log = cria_log_envio(pacote_enviar)
-            string_log += str_log
+            
+            if i == 3:
+                simulate_error(i, lista_pacotes, lista_pacotes[i])
 
-            recebe_confirmacao_recebimento(
-                pacote_enviar, last_sent_pkg, lista_pacotes)
+            else:
+                com1.sendData(pacote_enviar)
+                print(f'enviou o pacote {i}\n')
+                time.sleep(0.2)
+
+                recebe_confirmacao_recebimento(
+                    pacote_enviar, last_sent_pkg, lista_pacotes)
 
         time.sleep(1)
         # Encerra comunicação
@@ -208,7 +215,7 @@ def main():
 
 
 def cria_log_envio(pacote_enviar_bytes):
-    send_or_receive = 'envio'
+    send_or_receive = 'send'
     head_binario = list(pacote_enviar_bytes)[:10]
     head_int = [int.from_bytes(byte, 'big') for byte in head_binario]
 
