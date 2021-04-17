@@ -192,13 +192,24 @@ def main():
             delta_time = time.time() - init_timer1
             last_sent_pkg = i + 1
             pacote_enviar = lista_pacotes[i]
-            com1.sendData(pacote_enviar)
-            str_log = cria_log_envio(pacote_enviar)
-            string_log += str_log
 
-            recebe_confirmacao_recebimento(
-                pacote_enviar, last_sent_pkg, lista_pacotes)
+            if delta_time > 1 and delta_time < 8:  # to simulate and error in the connection
+                print('\n')
+                print(delta_time)
+                print('nao enviei nada pra simular o problema \n')
+                recebe_confirmacao_recebimento(
+                    pacote_enviar, last_sent_pkg, lista_pacotes)
 
+            else:
+                com1.sendData(pacote_enviar)
+                str_log = cria_log_envio(pacote_enviar)
+                string_log += str_log
+
+                print(f'enviou o pacote {i}\n')
+                time.sleep(0.2)
+
+                recebe_confirmacao_recebimento(
+                    pacote_enviar, last_sent_pkg, lista_pacotes)
         time.sleep(1)
         # Encerra comunicação
         print("-------------------------")
